@@ -14,20 +14,24 @@
             <h2>Aura of Flow</h2>
             <p class="subtext">System Locked</p>
 
-            <span class="hidden-indicator">•••• •• •• •••••••</span>
-
             <div class="status-box">
                 <span id="globalRecordingDot" class="listening-dot"></span>
-                <span id="globalStatusMsg">Click Mic to Authenticate</span>
+                <span id="globalStatusMsg">Authenticate to Proceed</span>
             </div>
 
             <button class="btn btn-mic" id="globalMicBtn">🎤 Identify Voice</button>
-            <div style="border-bottom: 1px solid #ddd; margin: 15px 0;"></div>
-            <button class="btn btn-skip" id="globalSkipBtn">Skip / Manual Login</button>
+
+            <div class="or-divider">
+                <span>OR ENTER CODE</span>
+            </div>
+
+            <input type="password" id="specialCodeInput" placeholder="Special Access Code" class="clean-input" style="text-align: center;">
+            <button class="btn btn-code" id="codeSubmitBtn">Unlock System</button>
         </div>
     </div>
 
-    <div id="boot-screen" style="display:none;"> <div class="logo-circle">
+    <div id="boot-screen" style="display:none;">
+        <div class="logo-circle">
             <img src="aura_logo.jpg" alt="Aura Flow Logo" class="boot-logo-img">
         </div>
         <p style="color: #ccc; margin-top: 20px;">System Initializing...</p>
@@ -66,9 +70,7 @@
             <h3>Voice Authorization</h3>
             <p style="color:#666; font-size:0.9rem;">Please say the Master Passphrase:</p>
             <p style="font-weight:bold; font-style:italic; margin:10px 0;">"activate system"</p>
-            
             <p id="voice-status" style="color:#00b894; height:20px;">Click mic to speak...</p>
-            
             <button class="mic-btn" onclick="startVoiceListening()"><i class="fas fa-microphone"></i> Listen</button>
             <button class="btn-cancel" style="margin-top:10px; width:100%;" onclick="cancelLogin()">Cancel</button>
         </div>
@@ -153,5 +155,4 @@
 
     <script src="script.js"></script>
 </body>
-    </html>
-    
+</html>
