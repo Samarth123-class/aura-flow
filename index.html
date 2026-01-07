@@ -9,29 +9,6 @@
 </head>
 <body>
 
-    <div id="global-security-layer">
-        <div class="security-box">
-            <h2>Aura of Flow</h2>
-            <p class="subtext">System Locked</p>
-
-            <div class="status-box">
-                <span id="globalRecordingDot" class="listening-dot"></span>
-                <span id="globalStatusMsg">Click Mic to Speak</span>
-            </div>
-
-            <button class="btn btn-mic" id="globalMicBtn">🎤 Identify Voice</button>
-
-            <div class="or-divider"><span>OR</span></div>
-
-            <input type="password" id="specialCodeInput" class="security-input" placeholder="Enter Special Code">
-            <button class="btn btn-code" id="codeSubmitBtn">Verify Code</button>
-
-            <div style="margin-top: 15px; border-top: 1px solid #eee; padding-top: 10px;">
-                <button class="btn-text" id="globalSkipBtn">Skip to Manual Login</button>
-            </div>
-        </div>
-    </div>
-
     <div id="boot-screen" style="display:none;">
         <div class="logo-circle">
             <img src="aura_logo.jpg" alt="Aura Flow Logo" class="boot-logo-img">
@@ -62,13 +39,32 @@
     </div>
 
     <div id="voice-modal" class="modal-overlay hidden">
-        <div class="security-box" style="border: 2px solid #00b894;">
-            <i class="fas fa-microphone-alt" id="mic-icon" style="font-size: 3rem; color: #333;"></i>
-            <h3>Voice Authorization</h3>
-            <p style="color:#666;">Say: "activate system"</p>
-            <p id="voice-status" style="color:#00b894;">Click mic to speak...</p>
-            <button class="mic-btn" onclick="startVoiceListening()">Listen</button>
-            <button class="btn-cancel" style="margin-top:10px; width:100%;" onclick="cancelLogin()">Cancel</button>
+        <div class="security-box" style="border: 2px solid #00b894; width: 380px;">
+            <i class="fas fa-user-secret" style="font-size: 3rem; color: #333;"></i>
+            <h3>Master Verification</h3>
+            
+            <div style="margin: 15px 0;">
+                <p style="color:#666; font-size: 0.9rem; margin-bottom: 5px;">Option 1: Voice Command</p>
+                <p style="font-size:0.8rem; color:#888; font-style: italic;">Say: "activate system"</p>
+                <button class="mic-btn" style="margin-top: 10px; padding: 10px;" onclick="startVoiceListening()">🎤 Click to Speak</button>
+                <p id="voice-status" style="color:#00b894; font-weight:bold; height:20px; margin-top:5px; font-size: 0.9rem;">...</p>
+            </div>
+
+            <div style="display:flex; align-items:center; margin:10px 0;">
+                <div style="flex:1; height:1px; background:#ddd;"></div>
+                <span style="padding:0 10px; color:#aaa; font-size:0.8rem; font-weight: bold;">OR</span>
+                <div style="flex:1; height:1px; background:#ddd;"></div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <p style="color:#666; font-size: 0.9rem; margin-bottom: 8px;">Option 2: Master Code</p>
+                <input type="password" id="master-code-input" placeholder="Enter Master Code" class="clean-input" style="text-align:center; letter-spacing: 2px;">
+            </div>
+            
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-cancel" onclick="cancelLogin()">Cancel</button>
+                <button class="btn-verify" style="background:#00b894;" onclick="verifyMasterCode()">Verify Code</button>
+            </div>
         </div>
     </div>
 
@@ -128,5 +124,4 @@
 
     <script src="script.js"></script>
 </body>
-    </html>
-    
+</html>
