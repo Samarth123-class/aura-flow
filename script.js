@@ -3,7 +3,9 @@
 const defaultUsers = {
     "master": { 
         pass: "master999", role: "Master", name: "System Overlord", 
-        quest: "Override Code", ans: "omega-level", voicePass: "activate system"
+        quest: "Override Code", ans: "omega-level", 
+        voicePass: "activate system",
+        codePass: "SamarthOP" // <--- NEW MASTER CODE
     },
     "admin": { 
         pass: "admin123", role: "Admin", name: "Principal System", 
@@ -20,123 +22,40 @@ let meetingLogs = [];
 let activeMeetingCode = null; 
 let currentUser = null;
 let tempUser = null; 
-let realAdmin = null; 
 let currentView = 'home';
-let targetUserForPass = null;
 
 function loadDatabase() {
     const savedData = localStorage.getItem('auraFlowDB');
-    users = savedData ? JSON.parse(savedData) : defaultUsers;
-    if(!users['master']) users['master'] = defaultUsers['master'];
+    try {
+        const defaults = JSON.parse(JSON.stringify(defaultUsers));
+        users = savedData ? JSON.parse(savedData) : defaults;
+        
+        // Ensure master exists and has the new codePass field (patching old data)
+        if(!users['master']) {
+            users['master'] = defaults['master'];
+        } else if (!users['master'].codePass) {
+            users['master'].codePass = defaults['master'].codePass;
+        }
+
+    } catch(e) {
+        console.error("Data corrupted, resetting DB", e);
+        users = JSON.parse(JSON.stringify(defaultUsers));
+    }
+
     const savedLogs = localStorage.getItem('auraLogs');
-    if(savedLogs) meetingLogs = JSON.parse(savedLogs);
+    if(savedLogs) {
+        try {
+            meetingLogs = JSON.parse(savedLogs);
+        } catch(e) {
+            meetingLogs = [];
+        }
+    }
 }
+
 function saveDatabase() { localStorage.setItem('auraFlowDB', JSON.stringify(users)); }
 loadDatabase(); 
 
-// ==========================================
-// NEW: GLOBAL STARTUP SECURITY ("Voice OR Code")
-// ==========================================
-const GLOBAL_AUDIO_PASS = "heyyy it's me samarth give me the access";
-const GLOBAL_TEXT_PASS = "SamarthOP"; // <--- CHANGE SPECIAL CODE HERE
-
-function initSecurityLayer() {
-    // Voice Listener
-    document.getElementById('globalMicBtn').addEventListener('click', startGlobalSecurityListening);
-    
-    // Code Listener
-    document.getElementById('codeSubmitBtn').addEventListener('click', checkGlobalCode);
-    
-    // Allow pressing "Enter" in the input field
-    document.getElementById('specialCodeInput').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') checkGlobalCode();
-    });
-
-    // Skip Listener
-    document.getElementById('globalSkipBtn').addEventListener('click', skipGlobalVerification);
-}
-
-function checkGlobalCode() {
-    const inputVal = document.getElementById('specialCodeInput').value;
-    const msgEl = document.getElementById('globalStatusMsg');
-    
-    if (inputVal === GLOBAL_TEXT_PASS) {
-        unlockGlobalSystem("Code Verified!");
-    } else {
-        msgEl.textContent = "Invalid Code.";
-        msgEl.style.color = "red";
-        document.getElementById('specialCodeInput').value = ""; // Clear input
-        setTimeout(() => {
-            msgEl.textContent = "Click Mic or Enter Code";
-            msgEl.style.color = "#555";
-        }, 2000);
-    }
-}
-
-function startGlobalSecurityListening() {
-    const msgEl = document.getElementById('globalStatusMsg');
-    const dot = document.getElementById('globalRecordingDot');
-    const btn = document.getElementById('globalMicBtn');
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    if (!SpeechRecognition) {
-        msgEl.textContent = "Browser not supported.";
-        return;
-    }
-
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'en-US';
-    recognition.interimResults = false;
-    recognition.maxAlternatives = 1;
-
-    recognition.onstart = function() {
-        msgEl.textContent = "Listening...";
-        msgEl.style.color = "#333";
-        dot.style.display = "inline-block";
-        btn.disabled = true;
-        btn.style.opacity = "0.7";
-    };
-
-    recognition.onresult = function(event) {
-        const transcript = event.results[0][0].transcript.toLowerCase();
-        const cleanTranscript = transcript.replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g,"").trim();
-
-        if (cleanTranscript.includes(GLOBAL_AUDIO_PASS)) {
-            unlockGlobalSystem("Voice Match Confirmed!");
-        } else {
-            msgEl.textContent = "No match.";
-            msgEl.style.color = "red";
-        }
-    };
-
-    recognition.onend = function() {
-        dot.style.display = "none";
-        btn.disabled = false;
-        btn.style.opacity = "1";
-    };
-    recognition.start();
-}
-
-function skipGlobalVerification() {
-    unlockGlobalSystem("Manual Bypass.");
-}
-
-function unlockGlobalSystem(reason) {
-    const layer = document.getElementById('global-security-layer');
-    const msgEl = document.getElementById('globalStatusMsg');
-    
-    msgEl.textContent = "Access Granted!";
-    msgEl.style.color = "green";
-
-    setTimeout(() => {
-        layer.style.opacity = "0";
-        setTimeout(() => {
-            layer.style.display = "none";
-            runBootSequence(); 
-        }, 500);
-    }, 600);
-}
-
+// --- BOOT SEQUENCE ---
 function runBootSequence() {
     const bootScreen = document.getElementById('boot-screen');
     bootScreen.style.display = 'flex'; 
@@ -196,17 +115,50 @@ function verifySecurityAnswer() {
 }
 
 function startVoiceListening() {
-    // Internal Master Voice Check
-    const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const status = document.getElementById('voice-status');
+
+    if(!SpeechRecognition) {
+        status.innerText = "Browser not supported";
+        return;
+    }
+    
+    const recognition = new SpeechRecognition();
     status.innerText = "Listening...";
+    status.style.color = "#00b894";
+
     recognition.start();
+
     recognition.onresult = (event) => {
-        if (event.results[0][0].transcript.toLowerCase().includes(users['master'].voicePass)) {
+        const transcript = event.results[0][0].transcript.toLowerCase();
+        // Check if transcript includes the pass phrase
+        if (transcript.includes(users['master'].voicePass)) {
             document.getElementById('voice-modal').classList.add('hidden');
             finishMasterLogin();
-        } else { status.innerText = "Incorrect."; }
+        } else { 
+            status.innerText = "Voice Not Recognized"; 
+            status.style.color = "red";
+        }
     };
+    
+    recognition.onerror = () => {
+        status.innerText = "Error. Try Code.";
+        status.style.color = "red";
+    }
+}
+
+function verifyMasterCode() {
+    const codeIn = document.getElementById('master-code-input').value;
+    const status = document.getElementById('voice-status'); // reuse status text area
+
+    if (codeIn === users['master'].codePass) {
+        document.getElementById('voice-modal').classList.add('hidden');
+        finishMasterLogin();
+    } else {
+        status.innerText = "Invalid Master Code";
+        status.style.color = "red";
+        document.getElementById('master-code-input').value = ""; // Clear input
+    }
 }
 
 function finishMasterLogin() {
@@ -223,6 +175,8 @@ function finishMasterLogin() {
 function cancelLogin() {
     document.getElementById('security-modal').classList.add('hidden');
     document.getElementById('voice-modal').classList.add('hidden');
+    document.getElementById('master-code-input').value = "";
+    document.getElementById('voice-status').innerText = "...";
 }
 
 function logout() {
@@ -231,14 +185,16 @@ function logout() {
     document.getElementById('login-container').style.display = 'flex';
     document.getElementById('username').value = "";
     document.getElementById('password').value = "";
+    document.getElementById('security-answer').value = "";
 }
 
 function setupDashboard(userId) {
     const user = users[userId];
+    if(!user) return; 
+
     document.getElementById('welcome-header').innerText = `${user.role} Dashboard`;
     document.getElementById('welcome-message').innerText = `Welcome, ${user.name}`;
     
-    // Only show certain nav items based on role
     const navInfo = document.getElementById('nav-info');
     const navMeeting = document.getElementById('nav-meeting');
     if(user.role === 'Admin' || user.role === 'Master') {
@@ -266,6 +222,5 @@ function setupDashboard(userId) {
     }
 }
 
-// Initial Listener
-window.addEventListener('load', initSecurityLayer);
-                                                                 
+// Start boot sequence immediately on load
+window.addEventListener('load', runBootSequence);
