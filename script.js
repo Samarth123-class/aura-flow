@@ -37,7 +37,7 @@ loadDatabase();
 // ==========================================
 // NEW: GLOBAL STARTUP SECURITY ("Voice OR Code")
 // ==========================================
-const GLOBAL_AUDIO_PASS = "heyyy it me samarth give me the access";
+const GLOBAL_AUDIO_PASS = "heyyy it's me samarth give me the access";
 const GLOBAL_TEXT_PASS = "SamarthOP"; // <--- CHANGE SPECIAL CODE HERE
 
 function initSecurityLayer() {
