@@ -9,8 +9,25 @@
 </head>
 <body>
 
-    <div id="boot-screen">
-        <div class="logo-circle">
+    <div id="global-security-layer">
+        <div class="security-box">
+            <h2>Aura of Flow</h2>
+            <p class="subtext">System Locked</p>
+
+            <span class="hidden-indicator">•••• •• •• •••••••</span>
+
+            <div class="status-box">
+                <span id="globalRecordingDot" class="listening-dot"></span>
+                <span id="globalStatusMsg">Click Mic to Authenticate</span>
+            </div>
+
+            <button class="btn btn-mic" id="globalMicBtn">🎤 Identify Voice</button>
+            <div style="border-bottom: 1px solid #ddd; margin: 15px 0;"></div>
+            <button class="btn btn-skip" id="globalSkipBtn">Skip / Manual Login</button>
+        </div>
+    </div>
+
+    <div id="boot-screen" style="display:none;"> <div class="logo-circle">
             <img src="aura_logo.jpg" alt="Aura Flow Logo" class="boot-logo-img">
         </div>
         <p style="color: #ccc; margin-top: 20px;">System Initializing...</p>
@@ -20,7 +37,7 @@
         <div class="verify-box">
             <i class="fas fa-fingerprint" style="font-size: 3rem; color: #00b894; margin-bottom: 20px;"></i>
             <h3 style="color: #fff;">Verifying Identity...</h3>
-            <p style="color: #ccc;">Checking Security Privileges</p>
+            <p style="color: #ccc;">Checking Biometrics</p>
             <div class="loading-bar"><div class="bar-progress"></div></div>
         </div>
     </div>
@@ -32,13 +49,39 @@
             </div>
             <h3>Security Check</h3>
             <p id="security-question-text" style="color:#555; font-weight:500; margin-bottom:15px;">Security Question</p>
-            
             <input type="password" id="security-answer" placeholder="Enter Answer" class="clean-input">
             <p id="security-error" class="error-msg" style="display:none; color:red; margin-top:5px;">Incorrect Answer</p>
-
             <div style="display:flex; gap:10px; margin-top:20px;">
                 <button class="btn-cancel" onclick="cancelLogin()">Cancel</button>
-                <button class="btn-verify" onclick="verifySecurityAnswer()">Verify Access</button>
+                <button class="btn-verify" onclick="verifySecurityAnswer()">Verify</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="voice-modal" class="modal-overlay hidden">
+        <div class="security-box" style="border: 2px solid #00b894;">
+            <div style="text-align:center; margin-bottom:20px;">
+                <i class="fas fa-microphone-alt" id="mic-icon" style="font-size: 3rem; color: #333;"></i>
+            </div>
+            <h3>Voice Authorization</h3>
+            <p style="color:#666; font-size:0.9rem;">Please say the Master Passphrase:</p>
+            <p style="font-weight:bold; font-style:italic; margin:10px 0;">"activate system"</p>
+            
+            <p id="voice-status" style="color:#00b894; height:20px;">Click mic to speak...</p>
+            
+            <button class="mic-btn" onclick="startVoiceListening()"><i class="fas fa-microphone"></i> Listen</button>
+            <button class="btn-cancel" style="margin-top:10px; width:100%;" onclick="cancelLogin()">Cancel</button>
+        </div>
+    </div>
+
+    <div id="password-modal" class="modal-overlay hidden">
+        <div class="security-box" style="border: 2px solid #ff4757;">
+            <h3 style="color:#ff4757;"><i class="fas fa-key"></i> Force Change Password</h3>
+            <p id="target-user-display" style="margin-bottom:15px; color:#555; font-weight:bold;">User: </p>
+            <input type="text" id="new-pass-input" placeholder="Enter New Password" class="clean-input">
+            <div style="display:flex; gap:10px; margin-top:20px;">
+                <button class="btn-cancel" onclick="closePassModal()">Cancel</button>
+                <button class="btn-verify" style="background:#ff4757;" onclick="confirmPasswordChange()">Update</button>
             </div>
         </div>
     </div>
@@ -65,7 +108,7 @@
                     <button class="btn-login" onclick="login()">SIGN IN</button>
                     <p id="login-error" class="error-msg">Invalid Credentials</p>
                     <p class="toggle-link" style="margin-top:20px; font-size:0.8rem; color:#888;">
-                        <i class="fas fa-lock"></i> Secured System
+                        <i class="fas fa-lock"></i> Authorized Personnel Only
                     </p>
                 </div>
             </div>
@@ -110,4 +153,5 @@
 
     <script src="script.js"></script>
 </body>
-</html>
+    </html>
+    
